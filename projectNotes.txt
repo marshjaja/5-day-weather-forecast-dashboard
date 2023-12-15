@@ -1,0 +1,61 @@
+- save search name, search history in localStorage, set search history to overflow-scroll?
+- the search history is a button when clicked again it should should city data
+- duplicate city data maybe specify city in country
+- pull out midday in data for time and temp( I think i have done that cause i am getting one return
+- make it responsive
+- main card is the same as the  first card in the array
+
+
+TODO
+https://api.openweathermap.org/img/w/' + weather.weather[0].icon + '.png
+
+1. when user search for a city the input, call weather api and show results in the HTML
+    - add eventListener to form submit
+    - get user input value
+    - built the API query URL based on the users input
+    - call API and render result in HTML
+        - get city name and show it in main weather forecast card
+        - get first weather forecast item and following values
+            - date
+            - temp
+            - wind speed
+            - humidity
+            - icon
+        - render values to main card
+        - loop through all weather array and get the values 
+            - date
+            - temp
+            - wind speed
+            - humidity
+            - icon
+        - render those on a small card
+
+
+
+2. when user search for city, store it in localStorage
+3. on initial page load, load the search history and show it as a list in the HTML
+    -
+    - built the API query URL based on the history stored in local storage (make this into a function)
+    - call API and render result in HTML
+4. when user clicks oon the search history, call call weather api show result
+5. CSS
+
+
+
+
+
+
+
+
+
+QUESTION FROM CLASS:
+Regarding to the history search limitation while understanding its not requirement, is there any function that adds one into an array and remove one(either the first item or the last one out), setting for instance 5 items in the array? 
+[item1, item2, item3, item4, item5 ] 
+-> adding item 6
+[item2, item3, item4, item5, item6 ]
+
+
+ANSWER FROM CLASS:
+One of the way to do this is to first delete the last item in the array and then add now item to the beginning of the array
+it can look like this first arra.pop, and then array.shift for example
+sorry array.unshift() to add at the beginning of the array 👍
