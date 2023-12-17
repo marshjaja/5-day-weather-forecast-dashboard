@@ -1,6 +1,7 @@
 let searchBtn = $("#search-button");
 let forecastDetails = $("#forecast");
 let todaysDetails = $("#today");
+let mainCard = $(".card-body");
 let APIKey = "32cc7390332ed9b5800335391e652255";
 let queryURL = "";
 let allWeatherData = $("#weather-data");
@@ -8,6 +9,8 @@ let allWeatherData = $("#weather-data");
 const getWeather = () => {
 	let newName = $("#search-input").val();
 	let cityName = $("#weather-search");
+	newName = capitalizeFirstLetter(newName);
+
 	cityName.text(newName);
 	queryURL =
 		"https://api.openweathermap.org/data/2.5/forecast?q=" +
@@ -16,62 +19,135 @@ const getWeather = () => {
 		APIKey;
 };
 
+const capitalizeFirstLetter = (str) => {
+	return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+const displayError = (message) => {
+	alert(message);
+};
+
+function updateMainCard(data) {
+	// Create a new card
+	let mainCard = $("<div>").addClass("card mb-3");
+	let cardRow = $("<div>").addClass("row g-0").attr("id", "main-card");
+	let cardBodyCol = $("<div>").addClass("col-md-8");
+	let cardBody = $("<div>").addClass("card-body");
+	let cardIconCol = $("<div>").addClass("col-md-4");
+
+	//?? MAIN CARD CITY
+	let city = $("#search-input").val();
+	$("#search-input").val("");
+	let displayCity = $("<h3>").text("Welcome to " + capitalizeFirstLetter(city));
+	displayCity.attr("class", "card-city");
+	cardBody.append(displayCity);
+
+	//?? MAIN CARD DATE
+	let startDate = dayjs();
+	let currentDate = startDate;
+	let formattedDate = currentDate.format("DD-MM-YYYY");
+	let dateElement = $("<p>").html(
+		"(" + "<strong>" + formattedDate + "</strong>" + ")"
+	);
+	cardBody.append(dateElement);
+
+	//?? MAIN CARD TEMP
+	let daysTemp = data.list[0].main.temp;
+	let displayTemp = $("<p>").text("The temperature is: " + daysTemp + " °C");
+	cardBody.append(displayTemp);
+
+	//?? MAIN CARD WIND SPEED
+	let daysWind = data.list[0].wind.speed;
+	let displayWind = $("<p>").text("Winds of " + daysWind + " km/h");
+	cardBody.append(displayWind);
+
+	//?? MAIN CARD HUMIDITY
+	let daysHumidity = data.list[0].main.humidity;
+	let displayHumidity = $("<p>").text("The humidity is: " + daysHumidity + "%");
+	cardBody.append(displayHumidity);
+	cardBodyCol.append(cardBody);
+
+	//?? MAIN CARD ICON
+	let cardImg = $("<img>").addClass("weatherIcon").attr("id", "card-img");
+	let daysIcon = data.list[0].weather[0].icon;
+	let iconURL = "https://openweathermap.org/img/wn/" + daysIcon + "@4x.png";
+	cardImg.attr("src", iconURL);
+
+	cardIconCol.append(cardImg);
+	cardRow.append(cardBodyCol, cardIconCol);
+	mainCard.append(cardRow);
+	todaysDetails.append(mainCard);
+}
+
 searchBtn.on("click", function (event) {
 	event.preventDefault();
+	todaysDetails.empty();
+	forecastDetails.empty();
 	getWeather();
 
 	fetch(queryURL)
 		.then(function (response) {
+			if (!response.ok) {
+				throw new Error("City not found");
+			}
 			return response.json();
 		})
 		.then(function (data) {
 			console.log(data);
-			// console.log(data.list[0].wind.speed);
-			// console.log(data.list[0].main.humidity);
-			// console.log(data.list[0].weather[0].icon);
+			updateMainCard(data);
 
-			//?? CITY
-			let city = $("#search-input").val();
-			$("#search-input").val("");
-			let displayCity = $("<h3>").text("Welcome to " + city);
-			displayCity.attr("class", "card-city");
-			todaysDetails.find("#card-city").text(city);
+			function getTemp() {
+				for (let i = 0; i < 5; i++) {
+					// Create a new card for each day
+					let newCard = $("<div>").addClass("col");
+					let cardBody = $("<div>").addClass("card-body");
+					let cardImg = $("<img>").addClass("card-img-top");
 
-			//?? DAYs ICON
-			let daysIcon = data.list[0].weather[0].icon;
-			let displayIcon = $("<img>");
-			displayIcon.attr(
-				"src",
-				"https://openweathermap.org/img/wn/" + daysIcon + "@4x.png"
-			);
-			todaysDetails.find("#card-img").attr("src", displayIcon.attr("src"));
+					//?? FORECAST ICON
+					let daysIcon = data.list[i].weather[0].icon;
+					let iconURL =
+						"https://openweathermap.org/img/wn/" + daysIcon + "@4x.png";
+					cardImg.attr("src", iconURL);
 
-			//?? DATE
-			let startDate = dayjs();
-			let currentDate = startDate;
-			let formattedDate = currentDate.format("DD-MM-YYYY");
-			let dateElement = $("<p>").html(
-				"(" + "<strong>" + formattedDate + "</strong>" + ")"
-			);
-			todaysDetails.find("#card-date").append(dateElement);
+					//?? FORECAST DATE
+					let startDate = dayjs();
+					let currentDate = startDate.add(i, "day");
+					let formattedDate = currentDate.format("DD-MM-YYYY");
+					let dateElement = $("<p>").html(
+						"(" + "<strong>" + formattedDate + "</strong>" + ")"
+					);
 
-			//?? TEMP
-			let daysTemp = data.list[0].main.temp;
-			let displayTemp = $("<p>").text(
-				"The temperature is: " + daysTemp + " °C"
-			);
-			todaysDetails.find("#card-temp").append(displayTemp);
+					//?? FORECAST TEMP
+					let tempData = data.list[i].main.temp;
+					let dayTemp = $("<p>").text("Temperature: " + tempData + " °C");
 
-			//? WIND SPEED
-			let daysWind = data.list[0].wind.speed;
-			displayWind = $("<p>").text("Winds of " + daysWind + " km/h");
-			todaysDetails.find("#card-wind").append(displayWind);
+					//?? FORECAST WIND
+					let daysWind = data.list[i].wind.speed;
+					let displayWind = $("<p>").text("Winds of " + daysWind + " km/h");
 
-			//?? HUMIDITY
-			let daysHumidity = data.list[0].main.humidity;
-			let displayHumidity = $("<p>").text(
-				"The humidity is: " + daysHumidity + "%"
-			);
-			todaysDetails.find("#card-humidity").append(displayHumidity);
+					//?? FORECAST HUMIDITY
+					let daysHumidity = data.list[i].main.humidity;
+					let displayHumidity = $("<p>").text(
+						"The humidity is: " + daysHumidity + "%"
+					);
+
+					cardBody.append(
+						cardImg,
+						dateElement,
+						dayTemp,
+						displayHumidity,
+						displayWind
+					);
+					newCard.append(cardBody);
+
+					forecastDetails.append(newCard);
+				}
+			}
+
+			getTemp();
+		})
+		.catch(function (error) {
+			console.error(error.message);
+			displayError("City not found. Please enter a valid city name.");
 		});
 });
