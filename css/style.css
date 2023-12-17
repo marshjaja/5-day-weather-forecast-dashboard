@@ -1,3 +1,47 @@
 .hello {
 	color: red;
 }
+
+.weather-header {
+	background: linear-gradient(
+		109.5deg,
+		rgb(13, 11, 136) 9.4%,
+		rgb(86, 255, 248) 78.4%
+	);
+}
+.card-city {
+	font-size: 24px;
+	color: #0c0c0c;
+}
+
+.outer-card {
+	border: 2px solid #1c1a1a;
+}
+.card-main {
+}
+.card-forecast {
+	background: linear-gradient(
+		121.7deg,
+		rgb(56, 127, 249) 22.9%,
+		rgb(67, 212, 255) 69%
+	);
+	border: 2px solid rgb(35, 66, 207);
+	border-radius: 8px;
+	padding: 5px;
+}
+
+#today,
+#forecast {
+	display: none;
+}
+
+#placeholder-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 50vh;
+}
+
+#placeholder-wrapper h1 {
+	text-align: center;
+}

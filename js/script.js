@@ -34,11 +34,11 @@ const displayError = (message) => {
 
 function updateMainCard(data) {
 	// Create a new card
-	let mainCard = $("<div>").addClass("card mb-3");
-	let cardRow = $("<div>").addClass("row g-0").attr("id", "main-card");
+	let mainCard = $("<div>").addClass("card mb-3 outer-card");
+	let cardRow = $("<div>").addClass("row g-0 ").attr("id", "main-card");
 	let cardBodyCol = $("<div>").addClass("col-md-8");
-	let cardBody = $("<div>").addClass("card-body");
-	let cardIconCol = $("<div>").addClass("col-md-4");
+	let cardBody = $("<div>").addClass("card-body card-main");
+	let cardIconCol = $("<div>").addClass("col-md-4 ");
 
 	//?? MAIN CARD CITY
 	let city = $("#search-input").val();
@@ -102,10 +102,14 @@ searchBtn.on("click", function (event) {
 			updateMainCard(data);
 
 			function getTemp() {
+				let forecastContainer = $("<div>").addClass(
+					"row g-2 justify-content-center"
+				);
+
 				for (let i = 0; i < 5; i++) {
 					// Create a new card for each day
-					let newCard = $("<div>").addClass("col");
-					let cardBody = $("<div>").addClass("card-body");
+					let newCard = $("<div>").addClass("col-md mb-2").addClass("col-8");
+					let cardBody = $("<div>").addClass("card-body card-forecast");
 					let cardImg = $("<img>").addClass("card-img-top");
 
 					//?? FORECAST ICON
@@ -145,14 +149,21 @@ searchBtn.on("click", function (event) {
 					);
 					newCard.append(cardBody);
 
-					forecastDetails.append(newCard);
+					forecastContainer.append(newCard);
 				}
+
+				forecastDetails.append(forecastContainer);
 			}
 
 			getTemp();
+			todaysDetails.css("display", "block");
+			forecastDetails.css("display", "flex");
+			$("#placeholder-wrapper").css("display", "none");
 		})
 		.catch(function (error) {
 			console.error(error.message);
 			displayError("City not found. Please enter a valid city name.");
 		});
 });
+
+// class="list-group" id="history"
