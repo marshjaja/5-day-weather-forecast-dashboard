@@ -24,7 +24,12 @@ const capitalizeFirstLetter = (str) => {
 };
 
 const displayError = (message) => {
-	alert(message);
+	Swal.fire({
+		title: "City name not found",
+		text: "Please Enter A Valid City Name",
+		icon: "error",
+	});
+	$("#search-input").val("");
 };
 
 function updateMainCard(data) {
