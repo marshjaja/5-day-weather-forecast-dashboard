@@ -99,47 +99,60 @@ $(document).ready(function () {
 			.then((data) => {
 				//?? Clear previous forecast data
 				$("#forecast").empty();
-
 				$("#forecast-text").text("5-Day Forecast:");
-				for (let i = 0; i < data.list.length; i += 8) {
-					//?? Loop for forecast in 8 interval to get daily approx cause it its a forecast
-					function getDayName(dateStr) {
-						const days = [
-							"Sunday",
-							"Monday",
-							"Tuesday",
-							"Wednesday",
-							"Thursday",
-							"Friday",
-							"Saturday",
-						];
-						const date = new Date(dateStr);
-						return days[date.getDay()];
-					}
 
+				function getDayName(dateStr) {
+					const days = [
+						"Sunday",
+						"Monday",
+						"Tuesday",
+						"Wednesday",
+						"Thursday",
+						"Friday",
+						"Saturday",
+					];
+					const date = new Date(dateStr);
+					return days[date.getDay()];
+				}
+				//?? Making sure the 5-Day Forecast doesnt start at current date
+				const today = new Date();
+				let startIndex = data.list.findIndex(
+					(slot) => new Date(slot.dt_txt).getDate() !== today.getDate()
+				);
+
+				startIndex = startIndex === -1 ? 0 : startIndex;
+
+				//?? Loop for forecast in 8 interval to get daily approx cause it its a forecast
+				for (let i = startIndex; i < data.list.length; i += 8) {
 					const day = data.list[i];
 					let forecastIcon = $("<img>").attr(
 						"src",
 						`http://openweathermap.org/img/w/${day.weather[0].icon}.png`
 					);
 					$("#forecast").append(`
-					
-					<div class="forecast-col col-12"> <!-- Adjusted classes for responsiveness -->
-					<div class="card">
-						<div class="card-body">
-						<h5 class="card-title">${getDayName(day.dt_txt)}</h5> <h6> ${new Date(
-						day.dt_txt
-					).toLocaleDateString()}</h6>
-
-							<p class='forecast-p'>${forecastIcon[0].outerHTML}</p>
-							<p class='forecast-p'>Temp: ${day.main.temp} °C</p>
-							<p class='forecast-p'>Humidity: ${day.main.humidity}%</p>
-							<p class='forecast-p'>Wind Speed: ${day.wind.speed} km/h</p>
-						</div>
-					</div>
-				</div>
-				
-            		`);
+                <div class="forecast-col col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${getDayName(
+															day.dt_txt
+														)}</h5>
+                            <h6>${new Date(
+															day.dt_txt
+														).toLocaleDateString()}</h6>
+                            <p class='forecast-p'>${
+															forecastIcon[0].outerHTML
+														}</p>
+                            <p class='forecast-p'>Temp: ${day.main.temp} °C</p>
+                            <p class='forecast-p'>Humidity: ${
+															day.main.humidity
+														}%</p>
+                            <p class='forecast-p'>Wind Speed: ${
+															day.wind.speed
+														} km/h</p>
+                        </div>
+                    </div>
+                </div>
+            `);
 				}
 			})
 			.catch((error) => {
@@ -164,7 +177,6 @@ $(document).ready(function () {
 	//?? Enter press triggers on click and retrieves the weather data
 	$("#search-input").keypress(function (e) {
 		if (e.which == 13) {
-			// Enter key has a keycode of 13
 			e.preventDefault();
 			$("#search-button").click();
 		}
