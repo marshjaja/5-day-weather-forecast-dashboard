@@ -1,14 +1,128 @@
-.weather-header {
+@import url("https://fonts.googleapis.com/css2?family=Cabin:wght@500;700&family=Edu+TAS+Beginner:wght@500&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,300&family=Martel+Sans:wght@400;600;900&family=Merienda&family=Merriweather:wght@400;700&family=Montserrat:wght@200;800;900&family=Orbitron:wght@500&family=Pacifico&family=Pixelify+Sans&family=Playfair+Display&family=Poppins:wght@300;500;600;700;900&family=Press+Start+2P&family=Sacramento&family=Stick+No+Bills:wght@500&family=Yanone+Kaffeesatz:wght@600&display=swap");
+
+body {
 	background: linear-gradient(
-		109.5deg,
-		rgb(13, 11, 136) 9.4%,
-		rgb(86, 255, 248) 78.4%
+		to right,
+		#e6f7ff,
+		#b3d9ff,
+		#80bfff,
+		#4da6ff,
+		#1a8cff
 	);
+	min-height: 100vh;
+	font-family: "Lato", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
+	color: #333;
+	font-family: "Lato", sans-serif;
+}
+#forecast .forecast-p {
+	font-size: 14px;
+}
+
+.weather-header {
+	background: linear-gradient(to right, #4da6ff, #1a8cff);
+	color: #fff;
+	text-align: center;
+	padding: 2rem 0;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	margin-bottom: 1rem;
+	text-transform: uppercase;
+}
+
+.weather-header h1 {
+	font-size: 3.5rem;
+	font-weight: 700;
+	text-shadow: 3px 2px 4px rgba(0, 0, 0, 0.5);
+	margin-bottom: 0;
+	font-family: "Roboto", sans-serif;
+
+	color: rgba(38, 38, 38, 0.836);
+}
+.card {
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 16px;
+	box-shadow: 0 4px 30px rgba(0.5, 0.3, 0, 0.1);
+	backdrop-filter: blur(5px);
+	-webkit-backdrop-filter: blur(5px);
+	border: 1px solid rgba(255, 255, 255, 0.3);
+}
+#form-heading,
+.card-title {
+	font-weight: 600;
+	color: #1a8cff;
+}
+
+.card-body p,
+.form-group p {
+	font-size: 1rem;
+	line-height: 1.5;
+}
+
+.btn-primary,
+.search-button {
+	background-color: #00b3ff;
+	color: #fff;
+	border: 1px solid #008cffcd;
+}
+
+.btn-custom {
+	background-color: #00b3ff;
+	color: #333;
+	border: 1px solid #00b3ff;
+	margin: 1px;
+	transition: all 0.3s ease;
+}
+
+.btn-custom:hover {
+	background-color: #0069d9;
+	color: #fff;
+	transform: scale(1.05);
+}
+
+.btn-custom:hover,
+.btn-custom:active,
+.btn-custom:focus {
+	position: relative;
+	z-index: 1;
+}
+
+#forecast-text {
+	margin-top: 10px;
+	margin-bottom: 10px;
 }
 
 @media (min-width: 768px) {
 	.forecast-col {
 		flex: 0 0 20%;
 		max-width: 20%;
+	}
+}
+
+@media (max-width: 767px) {
+	.forecast-col {
+		flex: 0 0 100%;
+		max-width: 100%;
+		margin-bottom: 10px;
+
+		text-align: center;
+	}
+
+	.forecast-col .card {
+		margin: 10px;
+		padding: 10px;
+	}
+
+	.forecast-col .card-body {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
 	}
 }

@@ -33,29 +33,47 @@ $(document).ready(function () {
 		fetch(queryURLCurrent)
 			.then((response) => response.json())
 			.then((data) => {
+				function getDayName(unixTimestamp) {
+					const days = [
+						"Sunday",
+						"Monday",
+						"Tuesday",
+						"Wednesday",
+						"Thursday",
+						"Friday",
+						"Saturday",
+					];
+					const date = new Date(unixTimestamp * 1000);
+					return days[date.getDay()];
+				}
+
 				let weatherIcon = $("<img>").attr(
 					"src",
 					`http://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`
 				);
 				//?? Display current weather
 				$("#today").html(`
+				
 				<div class="card">
-    <div class="card-body">
-                    <h2>Welcome to ${
-											data.name
-										}! (${new Date().toLocaleDateString()})</h2>
-					<p>${weatherIcon[0].outerHTML}</p>
-                    <p>The Temperature is: ${data.main.temp} °C</p>
-                    <p>The Humidity is: ${data.main.humidity}%</p>
-                    <p>The Wind Speed is: ${data.wind.speed} km/h</p>
-					</div>
-                    </div>
+        <div class="card-body">
+            <h2>Welcome to ${data.name}!</h2>
+			<h4 class="card-title">${getDayName(data.dt)} </h4>
+            <h5 >${new Date(data.dt * 1000).toLocaleDateString()}</h5>
+            
+            <p>${weatherIcon[0].outerHTML}</p>
+            <p class="highlight-text">The Temperature is: ${
+							data.main.temp
+						} °C</p>
+            <p>The Humidity is: ${data.main.humidity}%</p>
+            <p>The Wind Speed is: ${data.wind.speed} km/h</p>
+        </div>
+    </div>
                 `);
 
 				//?? Adds city to history if not already there
 				if ($("#history").find(`button:contains('${cityName}')`).length === 0) {
 					$("#history").append(
-						`<button class="list-group-item list-group-item-action">${cityName}</button>`
+						`<button class="btn btn-primary btn-custom">${cityName}</button>`
 					);
 					//?? Store in localStorage
 					let history = JSON.parse(
@@ -81,22 +99,42 @@ $(document).ready(function () {
 			.then((data) => {
 				//?? Clear previous forecast data
 				$("#forecast").empty();
+
+				$("#forecast-text").text("5-Day Forecast:");
 				for (let i = 0; i < data.list.length; i += 8) {
 					//?? Loop for forecast in 8 interval to get daily approx cause it its a forecast
+					function getDayName(dateStr) {
+						const days = [
+							"Sunday",
+							"Monday",
+							"Tuesday",
+							"Wednesday",
+							"Thursday",
+							"Friday",
+							"Saturday",
+						];
+						const date = new Date(dateStr);
+						return days[date.getDay()];
+					}
+
 					const day = data.list[i];
 					let forecastIcon = $("<img>").attr(
 						"src",
 						`http://openweathermap.org/img/w/${day.weather[0].icon}.png`
 					);
 					$("#forecast").append(`
+					
 					<div class="forecast-col col-12"> <!-- Adjusted classes for responsiveness -->
 					<div class="card">
 						<div class="card-body">
-							<h5 class="card-title">${new Date(day.dt_txt).toLocaleDateString()}</h5>
-							<p>${forecastIcon[0].outerHTML}</p>
-							<p>Temp: ${day.main.temp} °C</p>
-							<p>Humidity: ${day.main.humidity}%</p>
-							<p>Wind Speed: ${day.wind.speed} km/h</p>
+						<h5 class="card-title">${getDayName(day.dt_txt)}</h5> <h6> ${new Date(
+						day.dt_txt
+					).toLocaleDateString()}</h6>
+
+							<p class='forecast-p'>${forecastIcon[0].outerHTML}</p>
+							<p class='forecast-p'>Temp: ${day.main.temp} °C</p>
+							<p class='forecast-p'>Humidity: ${day.main.humidity}%</p>
+							<p class='forecast-p'>Wind Speed: ${day.wind.speed} km/h</p>
 						</div>
 					</div>
 				</div>
@@ -143,7 +181,7 @@ $(document).ready(function () {
 	);
 	storedHistory.forEach((city) => {
 		$("#history").append(
-			`<button class="list-group-item list-group-item-action">${city}</button>`
+			`<button class="btn btn-primary  btn-custom">${city}</button>`
 		);
 	});
 });
