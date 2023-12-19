@@ -1,169 +1,149 @@
-let searchBtn = $("#search-button");
-let forecastDetails = $("#forecast");
-let todaysDetails = $("#today");
-let mainCard = $(".card-body");
-let APIKey = "32cc7390332ed9b5800335391e652255";
-let queryURL = "";
-let allWeatherData = $("#weather-data");
+$(document).ready(function () {
+	//?? Display a dummy card for #forecast section to start
+	$("#today").html(`
+        <div class="card before-today">
+            <div class="card-body">
+			<h1>Welcome to Our Weather Explorer!</h1>
+			<p>Get started by searching for any city to see the current weather conditions and a 5-day forecast. </p>
+			<p>Discover the weather trends and plan your days better!</p>
+			
+               
+            </div>
+        </div>
+    `);
 
-const getWeather = () => {
-	let newName = $("#search-input").val();
-	let cityName = $("#weather-search");
-	newName = capitalizeFirstLetter(newName);
+	const APIKey = "32cc7390332ed9b5800335391e652255";
 
-	cityName.text(newName);
-	queryURL =
-		"https://api.openweathermap.org/data/2.5/forecast?q=" +
-		newName +
-		"&units=metric&cnt=5&appid=" +
-		APIKey;
-};
+	//?? Function updates the weather dashboard with current and forecast data
+	function updateWeather(cityName) {
+		$("#search-input").val("");
+		if (!cityName) {
+			Swal.fire({
+				title: "City name not found",
+				text: "Please enter a valid city name",
+				icon: "error",
+			});
+			return;
+		}
 
-const capitalizeFirstLetter = (str) => {
-	return str.charAt(0).toUpperCase() + str.slice(1);
-};
+		let queryURLCurrent = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${APIKey}&units=metric`;
+		let queryURLForecast = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${APIKey}&units=metric`;
 
-const displayError = (message) => {
-	Swal.fire({
-		title: "City name not found",
-		text: "Please Enter A Valid City Name",
-		icon: "error",
-	});
-	$("#search-input").val("");
-};
-
-function updateMainCard(data) {
-	// Create a new card
-	let mainCard = $("<div>").addClass("card mb-3 outer-card");
-	let cardRow = $("<div>").addClass("row g-0 ").attr("id", "main-card");
-	let cardBodyCol = $("<div>").addClass("col-md-8");
-	let cardBody = $("<div>").addClass("card-body card-main");
-	let cardIconCol = $("<div>").addClass("col-md-4 ");
-
-	//?? MAIN CARD CITY
-	let city = $("#search-input").val();
-	$("#search-input").val("");
-	let displayCity = $("<h3>").text("Welcome to " + capitalizeFirstLetter(city));
-	displayCity.attr("class", "card-city");
-	cardBody.append(displayCity);
-
-	//?? MAIN CARD DATE
-	let startDate = dayjs();
-	let currentDate = startDate;
-	let formattedDate = currentDate.format("DD-MM-YYYY");
-	let dateElement = $("<p>").html(
-		"(" + "<strong>" + formattedDate + "</strong>" + ")"
-	);
-	cardBody.append(dateElement);
-
-	//?? MAIN CARD TEMP
-	let daysTemp = data.list[0].main.temp;
-	let displayTemp = $("<p>").text("The temperature is: " + daysTemp + " °C");
-	cardBody.append(displayTemp);
-
-	//?? MAIN CARD WIND SPEED
-	let daysWind = data.list[0].wind.speed;
-	let displayWind = $("<p>").text("Winds of " + daysWind + " km/h");
-	cardBody.append(displayWind);
-
-	//?? MAIN CARD HUMIDITY
-	let daysHumidity = data.list[0].main.humidity;
-	let displayHumidity = $("<p>").text("The humidity is: " + daysHumidity + "%");
-	cardBody.append(displayHumidity);
-	cardBodyCol.append(cardBody);
-
-	//?? MAIN CARD ICON
-	let cardImg = $("<img>").addClass("weatherIcon").attr("id", "card-img");
-	let daysIcon = data.list[0].weather[0].icon;
-	let iconURL = "https://openweathermap.org/img/wn/" + daysIcon + "@4x.png";
-	cardImg.attr("src", iconURL);
-
-	cardIconCol.append(cardImg);
-	cardRow.append(cardBodyCol, cardIconCol);
-	mainCard.append(cardRow);
-	todaysDetails.append(mainCard);
-}
-
-searchBtn.on("click", function (event) {
-	event.preventDefault();
-	todaysDetails.empty();
-	forecastDetails.empty();
-	getWeather();
-
-	fetch(queryURL)
-		.then(function (response) {
-			if (!response.ok) {
-				throw new Error("City not found");
-			}
-			return response.json();
-		})
-		.then(function (data) {
-			console.log(data);
-			updateMainCard(data);
-
-			function getTemp() {
-				let forecastContainer = $("<div>").addClass(
-					"row g-2 justify-content-center"
+		//?? Fetch current weather data from api
+		fetch(queryURLCurrent)
+			.then((response) => response.json())
+			.then((data) => {
+				let weatherIcon = $("<img>").attr(
+					"src",
+					`http://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`
 				);
+				//?? Display current weather
+				$("#today").html(`
+				<div class="card">
+    <div class="card-body">
+                    <h2>Welcome to ${
+											data.name
+										}! (${new Date().toLocaleDateString()})</h2>
+					<p>${weatherIcon[0].outerHTML}</p>
+                    <p>The Temperature is: ${data.main.temp} °C</p>
+                    <p>The Humidity is: ${data.main.humidity}%</p>
+                    <p>The Wind Speed is: ${data.wind.speed} km/h</p>
+					</div>
+                    </div>
+                `);
 
-				for (let i = 0; i < 5; i++) {
-					// Create a new card for each day
-					let newCard = $("<div>").addClass("col-md mb-2").addClass("col-8");
-					let cardBody = $("<div>").addClass("card-body card-forecast");
-					let cardImg = $("<img>").addClass("card-img-top");
-
-					//?? FORECAST ICON
-					let daysIcon = data.list[i].weather[0].icon;
-					let iconURL =
-						"https://openweathermap.org/img/wn/" + daysIcon + "@4x.png";
-					cardImg.attr("src", iconURL);
-
-					//?? FORECAST DATE
-					let startDate = dayjs();
-					let currentDate = startDate.add(i, "day");
-					let formattedDate = currentDate.format("DD-MM-YYYY");
-					let dateElement = $("<p>").html(
-						"(" + "<strong>" + formattedDate + "</strong>" + ")"
+				//?? Adds city to history if not already there
+				if ($("#history").find(`button:contains('${cityName}')`).length === 0) {
+					$("#history").append(
+						`<button class="list-group-item list-group-item-action">${cityName}</button>`
 					);
-
-					//?? FORECAST TEMP
-					let tempData = data.list[i].main.temp;
-					let dayTemp = $("<p>").text("Temperature: " + tempData + " °C");
-
-					//?? FORECAST WIND
-					let daysWind = data.list[i].wind.speed;
-					let displayWind = $("<p>").text("Winds of " + daysWind + " km/h");
-
-					//?? FORECAST HUMIDITY
-					let daysHumidity = data.list[i].main.humidity;
-					let displayHumidity = $("<p>").text(
-						"The humidity is: " + daysHumidity + "%"
+					//?? Store in localStorage
+					let history = JSON.parse(
+						localStorage.getItem("weatherHistory") || "[]"
 					);
-
-					cardBody.append(
-						cardImg,
-						dateElement,
-						dayTemp,
-						displayHumidity,
-						displayWind
-					);
-					newCard.append(cardBody);
-
-					forecastContainer.append(newCard);
+					history.push(cityName);
+					localStorage.setItem("weatherHistory", JSON.stringify(history));
 				}
+			})
+			.catch((error) => {
+				console.error("Error:", error);
+				//?? Custom error with sweet alert
+				Swal.fire({
+					title: "City name not found",
+					text: "Please enter a valid city name",
+					icon: "error",
+				});
+			});
 
-				forecastDetails.append(forecastContainer);
-			}
+		//?? Fetch 5-day forecast data
+		fetch(queryURLForecast)
+			.then((response) => response.json())
+			.then((data) => {
+				//?? Clear previous forecast data
+				$("#forecast").empty();
+				for (let i = 0; i < data.list.length; i += 8) {
+					//?? Loop for forecast in 8 interval to get daily approx cause it its a forecast
+					const day = data.list[i];
+					let forecastIcon = $("<img>").attr(
+						"src",
+						`http://openweathermap.org/img/w/${day.weather[0].icon}.png`
+					);
+					$("#forecast").append(`
+					<div class="forecast-col col-12"> <!-- Adjusted classes for responsiveness -->
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">${new Date(day.dt_txt).toLocaleDateString()}</h5>
+							<p>${forecastIcon[0].outerHTML}</p>
+							<p>Temp: ${day.main.temp} °C</p>
+							<p>Humidity: ${day.main.humidity}%</p>
+							<p>Wind Speed: ${day.wind.speed} km/h</p>
+						</div>
+					</div>
+				</div>
+				
+            		`);
+				}
+			})
+			.catch((error) => {
+				//?? Custom error with sweet alert
+				console.error("Error:", error);
+				Swal.fire({
+					title: "City name not found",
+					text: "Please enter a valid city name",
+					icon: "error",
+				});
+			});
+	}
 
-			getTemp();
-			todaysDetails.css("display", "block");
-			forecastDetails.css("display", "flex");
-			$("#placeholder-wrapper").css("display", "none");
-		})
-		.catch(function (error) {
-			console.error(error.message);
-			displayError("City not found. Please enter a valid city name.");
-		});
+	//?? Search button on click and retrieves the weather data
+	$("#search-button").click(function () {
+		let cityName = $("#search-input").val().trim();
+		if (cityName) {
+			updateWeather(cityName);
+		}
+	});
+
+	//?? Enter press triggers on click and retrieves the weather data
+	$("#search-input").keypress(function (e) {
+		if (e.which == 13) {
+			// Enter key has a keycode of 13
+			e.preventDefault();
+			$("#search-button").click();
+		}
+	});
+
+	//?? History items on click even
+	$("#history").on("click", "button", function () {
+		updateWeather($(this).text());
+	});
+
+	//?? LocalStorage history load
+	let storedHistory = JSON.parse(
+		localStorage.getItem("weatherHistory") || "[]"
+	);
+	storedHistory.forEach((city) => {
+		$("#history").append(
+			`<button class="list-group-item list-group-item-action">${city}</button>`
+		);
+	});
 });
-
-// class="list-group" id="history"
